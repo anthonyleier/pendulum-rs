@@ -43,7 +43,6 @@ struct Pendulo {
     aceleracao_angular: f32,
 
     raio: f32,
-    massa: f32,
     gravidade: f32,
 }
 
@@ -56,25 +55,24 @@ impl Pendulo {
             velocidade_angular: 0.0,
             aceleracao_angular: 0.0,
             raio: raio,
-            massa: 1.0,
             gravidade: 1.5,
             cor: cor,
         }
     }
     fn update(&mut self) {
         // Calcular a aceleração angular com a equação do pêndulo
-        self.aceleracao_angular =
-            -1.0 * (1.0 / self.massa) * self.gravidade * self.angulo.sin() / self.raio;
+        self.aceleracao_angular = -1.0 * (self.gravidade / self.raio) * self.angulo.sin();
 
         // A velocidade angular é a velocidade angular mais a aceleração angular
         self.velocidade_angular += self.aceleracao_angular;
 
         // O angulo é o angulo mais a velocidade angular
-        self.angulo += self.velocidade_angular;
+        self.angulo += self.velocidade_angular + (self.aceleracao_angular / 2.0);
 
         // A posição são as coordenadas polares convertidas em coordenadas cartesianas
-        self.posicao
-            .set(self.raio * self.angulo.sin(), self.raio * self.angulo.cos());
+        let x = self.raio * self.angulo.sin();
+        let y = self.raio * self.angulo.cos();
+        self.posicao.set(x, y);
 
         // A posição final da bola na tela é a origem do pêndulo mais o vetor de posição
         self.posicao.add(&self.origem);
