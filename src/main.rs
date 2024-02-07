@@ -18,9 +18,13 @@ struct MyWindowHandler {
 }
 impl WindowHandler for MyWindowHandler {
     fn on_draw(&mut self, helper: &mut WindowHelper<()>, graphics: &mut Graphics2D) {
-        graphics.clear_screen(Color::from_rgb(0.8, 0.9, 1.0));
+        let cor = Color::from_int_rgb(193, 209, 224);
+        graphics.clear_screen(cor);
+
         self.pendulo.update();
         self.pendulo.draw(graphics);
+
+        helper.request_redraw();
     }
 }
 
@@ -52,7 +56,8 @@ impl Pendulo {
     }
     fn update(&mut self) {
         // Calcular a aceleração angular com a equação do pêndulo
-        self.aceleracao_angular = -1.0 * self.gravidade * self.angulo.sin() / self.raio;
+        self.aceleracao_angular =
+            -1.0 * (1.0 / self.massa) * self.gravidade * self.angulo.sin() / self.raio;
 
         // A velocidade angular é a velocidade angular mais a aceleração angular
         self.velocidade_angular += self.aceleracao_angular;
@@ -68,13 +73,14 @@ impl Pendulo {
         self.posicao.add(&self.origem);
     }
     fn draw(&self, graphics: &mut Graphics2D) {
+        let cor = Color::from_int_rgb(25, 125, 224);
         graphics.draw_line(
             (self.origem.x, self.origem.y),
             (self.posicao.x, self.posicao.y),
             3.0,
-            Color::CYAN,
+            cor,
         );
-        graphics.draw_circle((self.posicao.x, self.posicao.y), 30.0, Color::CYAN);
+        graphics.draw_circle((self.posicao.x, self.posicao.y), 30.0, cor);
     }
 }
 
@@ -96,7 +102,7 @@ mod vetor {
 
         pub fn set(&mut self, x: f32, y: f32) -> &Vetor {
             self.x = x;
-            self.x = y;
+            self.y = y;
             return self;
         }
     }
