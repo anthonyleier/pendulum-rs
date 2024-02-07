@@ -1,7 +1,27 @@
+use speedy2d::{
+    color::Color,
+    window::{WindowHandler, WindowHelper},
+    Graphics2D, Window,
+};
 use vetor::Vetor;
 
 fn main() {
-    println!("Hello, world!");
+    let window = Window::new_centered("Pendulum", (800, 480)).unwrap();
+    let my_window = MyWindowHandler {
+        pendulo: Pendulo::new(400.0, 0.0, 200.0),
+    };
+    window.run_loop(my_window);
+}
+
+struct MyWindowHandler {
+    pendulo: Pendulo,
+}
+impl WindowHandler for MyWindowHandler {
+    fn on_draw(&mut self, helper: &mut WindowHelper<()>, graphics: &mut Graphics2D) {
+        graphics.clear_screen(Color::from_rgb(0.8, 0.9, 1.0));
+        self.pendulo.update();
+        self.pendulo.draw(graphics);
+    }
 }
 
 struct Pendulo {
@@ -47,7 +67,15 @@ impl Pendulo {
         // A posição final da bola na tela é a origem do pêndulo mais o vetor de posição
         self.posicao.add(&self.origem);
     }
-    fn draw() {}
+    fn draw(&self, graphics: &mut Graphics2D) {
+        graphics.draw_line(
+            (self.origem.x, self.origem.y),
+            (self.posicao.x, self.posicao.y),
+            3.0,
+            Color::CYAN,
+        );
+        graphics.draw_circle((self.posicao.x, self.posicao.y), 30.0, Color::CYAN);
+    }
 }
 
 mod vetor {
@@ -60,7 +88,7 @@ mod vetor {
             Vetor { x, y }
         }
 
-        pub fn add(&mut self, outro: Vetor) -> &Vetor {
+        pub fn add(&mut self, outro: &Vetor) -> &Vetor {
             self.x += outro.x;
             self.y += outro.y;
             return self;
